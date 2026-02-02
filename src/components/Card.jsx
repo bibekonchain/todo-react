@@ -1,123 +1,109 @@
 import { useState } from "react";
-import { FaTrash, FaEdit, FaSave } from "react-icons/fa"; // Import Icons
+import { FaTrash, FaEdit, FaSave } from "react-icons/fa";
 
 const Card = () => {
   const [task, setTask] = useState("");
   const [todos, setTodos] = useState([]);
-  const [editId, setEditId] = useState(null); // Track task being edited
-  const [editText, setEditText] = useState(""); // Store edited text
+  const [editId, setEditId] = useState(null);
+  const [editText, setEditText] = useState("");
 
-  // Handle input change
-  const handleInputChange = (e) => {
-    setTask(e.target.value);
-  };
-
-  // Add a new task
+  const handleInputChange = (e) => setTask(e.target.value);
   const handleSubmit = () => {
-    if (task.trim() === "") return;
+    if (!task.trim()) return;
     setTodos([{ id: Date.now(), text: task }, ...todos]);
     setTask("");
   };
-
-  // Delete a task
-  const handleDelete = (id) => {
-    setTodos(todos.filter((todo) => todo.id !== id));
-  };
-
-  // Enable edit mode
+  const handleDelete = (id) => setTodos(todos.filter((todo) => todo.id !== id));
   const handleEdit = (id, text) => {
-    setEditId(id); // Set task ID being edited
-    setEditText(text); // Set current text in input field
+    setEditId(id);
+    setEditText(text);
   };
-
-  // Save the edited task
   const handleSaveEdit = () => {
     setTodos(
       todos.map((todo) =>
         todo.id === editId ? { ...todo, text: editText } : todo
       )
     );
-    setEditId(null); // Exit edit mode
-    setEditText(""); // Clear edit input field
+    setEditId(null);
+    setEditText("");
   };
 
   return (
-    <div className="flex flex-col justify-center items-center bg-gray-900 min-h-screen p-4">
-      <h3 className="text-white text-3xl font-semibold mb-6">
+    <div className="flex flex-col items-center justify-start bg-gradient-to-b from-gray-900 to-gray-800 min-h-screen p-6">
+      <h1 className="text-4xl font-bold text-white mb-8 animate-pulse">
         📌 My To-Do List
-      </h3>
+      </h1>
 
-      {/* Input and Add Button */}
-      <div className="flex gap-3 w-full max-w-xl mb-4">
+      {/* Input Section */}
+      <div className="flex w-full max-w-2xl gap-4 mb-6">
         <input
           type="text"
-          placeholder="Enter the task..."
+          placeholder="Add a new task..."
           value={task}
           onChange={handleInputChange}
-          className="flex-1 p-3 border border-gray-600 rounded-lg bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+          className="flex-1 p-4 rounded-xl bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-green-400 shadow-inner"
         />
         <button
           onClick={handleSubmit}
           disabled={!task.trim()}
-          className="bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-xl font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Add
         </button>
       </div>
 
       {/* Todo List */}
-      <div className="w-full max-w-xl">
+      <div className="w-full max-w-2xl space-y-4">
         {todos.length === 0 ? (
-          <p className="text-gray-400 text-center">No tasks added yet. 📜</p>
+          <p className="text-gray-400 text-center text-lg italic">
+            No tasks added yet... 📝
+          </p>
         ) : (
-          <div className="space-y-3">
-            {todos.map((todo, index) => (
-              <div
-                key={todo.id}
-                className="bg-gray-800 text-white p-3 rounded-lg flex justify-between items-center shadow-md"
-              >
-                {/* If in edit mode, show input field */}
+          todos.map((todo, index) => (
+            <div
+              key={todo.id}
+              className="flex items-center justify-between bg-gray-700 hover:bg-gray-600 transition-all shadow-lg rounded-xl p-4"
+            >
+              {/* Task Text or Edit Input */}
+              {editId === todo.id ? (
+                <input
+                  type="text"
+                  value={editText}
+                  onChange={(e) => setEditText(e.target.value)}
+                  className="flex-1 p-2 rounded-md bg-gray-600 text-white border border-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+                />
+              ) : (
+                <span className="text-white text-lg font-medium">
+                  {index + 1}. {todo.text}
+                </span>
+              )}
+
+              {/* Action Buttons */}
+              <div className="flex gap-3 ml-4">
                 {editId === todo.id ? (
-                  <input
-                    type="text"
-                    value={editText}
-                    onChange={(e) => setEditText(e.target.value)}
-                    className="flex-1 p-2 bg-gray-700 text-white border border-gray-500 rounded-md focus:outline-none"
-                  />
-                ) : (
-                  <span className="font-semibold text-lg">
-                    {index + 1}. {todo.text}
-                  </span>
-                )}
-
-                {/* Action Buttons (Edit, Save, Delete) */}
-                <div className="flex gap-2">
-                  {editId === todo.id ? (
-                    <button
-                      onClick={handleSaveEdit}
-                      className="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600 transition"
-                    >
-                      <FaSave /> {/* Save Icon */}
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => handleEdit(todo.id, todo.text)}
-                      className="bg-yellow-500 text-white px-3 py-1 rounded-md hover:bg-yellow-600 transition"
-                    >
-                      <FaEdit /> {/* Edit Icon */}
-                    </button>
-                  )}
-
                   <button
-                    onClick={() => handleDelete(todo.id)}
-                    className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 transition"
+                    onClick={handleSaveEdit}
+                    className="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-md transition"
                   >
-                    <FaTrash /> {/* Trash Bin Icon */}
+                    <FaSave />
                   </button>
-                </div>
+                ) : (
+                  <button
+                    onClick={() => handleEdit(todo.id, todo.text)}
+                    className="bg-yellow-500 hover:bg-yellow-600 text-white p-2 rounded-md transition"
+                  >
+                    <FaEdit />
+                  </button>
+                )}
+                <button
+                  onClick={() => handleDelete(todo.id)}
+                  className="bg-red-500 hover:bg-red-600 text-white p-2 rounded-md transition"
+                >
+                  <FaTrash />
+                </button>
               </div>
-            ))}
-          </div>
+            </div>
+          ))
         )}
       </div>
     </div>
